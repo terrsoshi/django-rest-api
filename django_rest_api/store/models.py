@@ -42,7 +42,7 @@ class ShoppingCart(models.Model):
     def subtotal(self):
         amount = 0.0
         for item in self.shopping_cart_items:
-            amount += item.quantity * item.product.get_price()
+            amount += item.quantity * item.product.get_rounded_price()
         return round(amount, 2)
 
     def taxes(self):
