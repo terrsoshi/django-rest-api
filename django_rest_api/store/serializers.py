@@ -34,6 +34,7 @@ class ProductSerializer(serializers.ModelSerializer):
         help_text='Accepted format is "12:01 PM 16 April 2019"',
         style={'input_type': 'text', 'placeholder': '12:01 AM 28 July 2019'},
     )
+    
     class Meta:
         model = Product 
         fields = ('id', 'name', 'description', 'price', 'sale_start', 'sale_end', 'is_on_sale', 'current_price', 'cart_items')
@@ -41,3 +42,10 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_cart_items(self, instance):
         items = ShoppingCartItem.objects.filter(product=instance)
         return CartItemSerializer(items, many=True).data
+    
+class ProductStatSerializer(serializers.Serializer):
+    stats = serializers.DictField(
+        child=serializers.ListField(
+            child=serializers.IntegerField(),
+        )
+    )
