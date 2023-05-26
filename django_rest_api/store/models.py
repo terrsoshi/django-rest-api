@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.utils import timezone
 from django.db import models
 
@@ -25,7 +26,7 @@ class Product(models.Model):
 
     def current_price(self):
         if self.is_on_sale():
-            discounted_price = self.price * (1 - self.DISCOUNT_RATE)
+            discounted_price = Decimal(self.price) * Decimal(1 - self.DISCOUNT_RATE)
             return round(discounted_price, 2)
         return self.get_rounded_price()
 
@@ -42,14 +43,14 @@ class ShoppingCart(models.Model):
     def subtotal(self):
         amount = 0.0
         for item in self.shopping_cart_items:
-            amount += item.quantity * item.product.get_rounded_price()
+            amount += item.quantity * item.product.current_price()
         return round(amount, 2)
 
     def taxes(self):
         return round(self.TAX_RATE * self.subtotal(), 2)
 
     def total(self):
-        return round(self.subtotal() * self.taxes(), 2)
+        return round(self.subtotal() + self.taxes(), 2)
  
     def __repr__(self):
         name = self.name or '[Guest]'
@@ -66,3 +67,5 @@ class ShoppingCartItem(models.Model):
 
     def __repr__(self):
         return '<ShoppingCartItem object ({}) {}x "{}">'.format(self.id, self.quantity, self.product.name)
+
+
